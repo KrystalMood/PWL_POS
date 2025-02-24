@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LevelController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\SalesController;
@@ -31,3 +32,6 @@ Route::prefix('category')->group(function () {
     Route::get('home-care', [ProductCategoryController::class, 'homeCare'])->name('category.home-care');
     Route::get('baby-kid', [ProductCategoryController::class, 'babyKid'])->name('category.baby-kid');
 });
+
+
+Route::get('/level', [LevelController::class,'index']);
