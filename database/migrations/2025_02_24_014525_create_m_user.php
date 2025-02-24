@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('username', 20)->unique();
             $table->string('nama', 100);
             $table->string('password');
-            $table->timestamp('created_at');
+            $table->timestamps();
 
             $table->foreign('level_id')->references('level_id')->on('m_level');
         });
