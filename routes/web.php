@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LevelController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductCategoryController;
@@ -35,3 +36,4 @@ Route::prefix('category')->group(function () {
 
 
 Route::get('/level', [LevelController::class,'index']);
+Route::get('/kategori', [KategoriController::class, 'index'] );
