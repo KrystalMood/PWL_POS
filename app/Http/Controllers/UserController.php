@@ -10,9 +10,8 @@ class UserController extends Controller
 {
     public function index()
     {
-       $user = UserModel::findOr(20, ['username', 'nama'], function () {
-        abort(404);
-       });
+       $user = UserModel::where('level_id', 2)->count();
+    //    dd($user);
        return view('user',['user'=> $user]);    
     }
 }

@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Data User</h1>
-    <table border="1" cellpadding="2" cellspacing="0">
+    {{-- <table border="1" cellpadding="2" cellspacing="0">
         <tr>
             <th>ID</th>
             <th>Username</th>
@@ -24,6 +24,16 @@
             <td colspan="4">No user found</td>
         </tr>
         @endif
+    </table> --}}
+    <table border="1" cellpadding="2" cellspacing="0">
+        <tr>
+            <th>Level ID</th>
+            <th>Count</th>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>{{ $user }}</td>
+        </tr>
     </table>
 </body>
 </html>
