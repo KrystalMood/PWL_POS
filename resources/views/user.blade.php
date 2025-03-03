@@ -12,14 +12,18 @@
             <th>Nama</th>
             <th>Level Pengguna</th>
         </tr>
-        @foreach ($user as $d)
+        @if($user)
         <tr>
-            <td>{{ $d->user_id }}</td>
-            <td>{{ $d->username }}</td>
-            <td>{{ $d->nama }}</td>
-            <td>{{ $d->level_id }}</td>
+            <td>{{ $user->user_id }}</td>
+            <td>{{ $user->username }}</td>
+            <td>{{ $user->nama }}</td>
+            <td>{{ $user->level_id }}</td>
         </tr>
-        @endforeach
+        @else
+        <tr>
+            <td colspan="4">No user found</td>
+        </tr>
+        @endif
     </table>
 </body>
 </html>
