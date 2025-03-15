@@ -73,6 +73,7 @@ class KategoriController extends Controller
         ]);
         
         return redirect('/kategori')->with('success', 'Kategori berhasil ditambahkan');
+
     }
     
     public function show(string $id)
@@ -132,4 +133,6 @@ class KategoriController extends Controller
         
         return redirect('/kategori')->with('success', 'Kategori berhasil dihapus');
     }
+
+
 }
