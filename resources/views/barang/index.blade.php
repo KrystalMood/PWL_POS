@@ -13,6 +13,20 @@
         <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="kategori_filter">Filter Kategori:</label>
+                    <select id="kategori_filter" class="form-control">
+                        <option value="">Semua Kategori</option>
+                        @foreach(\App\Models\KategoriModel::all() as $kategori)
+                            <option value="{{ $kategori->kategori_id }}">{{ $kategori->kategori_nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <table class="table table-bordered table-striped" id="tbl-barang">
             <thead>
                 <tr>
@@ -56,14 +70,15 @@
     }
 
     $(document).ready(function() {
-        $('#tbl-barang').DataTable({
+        var table = $('#tbl-barang').DataTable({
             serverSide: true,
             processing: true,
             ajax: {
                 url: "{{ url('barang/list') }}",
                 type: "POST",
                 data: function(d) {
-                    d._token = "{{ csrf_token() }}"
+                    d._token = "{{ csrf_token() }}";
+                    d.kategori_id = $('#kategori_filter').val();
                 }
             },
             columns: [{
@@ -105,6 +120,10 @@
                     sortable: false
                 }
             ]
+        });
+        
+        $('#kategori_filter').on('change', function() {
+            table.ajax.reload();
         });
     });
 </script>
