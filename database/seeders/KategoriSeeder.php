@@ -34,6 +34,11 @@ class KategoriSeeder extends Seeder
                 'kategori_kode' => 'ELK',
                 'kategori_nama' => 'Elektronik',
             ],
+            [
+                'kategori_id' => 5,
+                'kategori_kode' => 'ATK',
+                'kategori_nama' => 'Alat Tulis Kantor',
+            ],
         ];
         
         DB::table('m_kategori')->insert($data);
