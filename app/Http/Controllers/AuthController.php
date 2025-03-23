@@ -38,7 +38,6 @@ class AuthController extends Controller
                     ]
                 ]);
             } catch (\Exception $e) {
-                // Log the error for debugging
                 Log::error('Login error: ' . $e->getMessage());
                 
                 return response()->json([
@@ -58,5 +57,10 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('login');
+    }
+
+    public function register()
+    {
+        return view('auth.register');
     }
 }
