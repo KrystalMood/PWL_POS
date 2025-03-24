@@ -62,12 +62,42 @@
                         <input type="text" id="username" name="username" class="form-control" placeholder="Username">
                         <div class="input-group-append">
                             <div class="input-group-text">
-                                <span class="fas fa-user"></span>
+                                <span class="fas fa-user-tag"></span>
                             </div>
                         </div>
                     </div>
                     <div class="error-container">
                         <small id="error-username" class="error-text text-danger"></small>
+                    </div>
+                    
+                    <div class="input-group mb-1">
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Email">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="error-container">
+                        <small id="error-email" class="error-text text-danger"></small>
+                    </div>
+                    
+                    <div class="input-group mb-1">
+                        <select id="level_id" name="level_id" class="form-control">
+                            <option value="">Pilih Level</option>
+                            <option value="1">Administrator</option>
+                            <option value="2">Manager</option>
+                            <option value="3">Staff/Kasir</option>
+                            <option value="4">Customer</option>
+                        </select>
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user-tag"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="error-container">
+                        <small id="error-level_id" class="error-text text-danger"></small>
                     </div>
                     
                     <div class="input-group mb-1">
@@ -134,8 +164,10 @@
         $(document).ready(function() {
             $("#form-register").validate({
                 rules: {
-                    nama: {required: true, minlength: 3, maxlength: 50},
-                    username: {required: true, minlength: 4, maxlength: 20},
+                    nama: {required: true, minlength: 3, maxlength: 100},
+                    username: {required: true, minlength: 3, maxlength: 20},
+                    email: {required: true, email: true},
+                    level_id: {required: true},
                     password: {required: true, minlength: 6, maxlength: 20},
                     password_confirmation: {required: true, equalTo: "#password"}
                 },
@@ -143,6 +175,10 @@
                     return true;
                 },
                 submitHandler: function(form) {
+                    var submitBtn = $(form).find('button[type="submit"]');
+                    var originalText = submitBtn.text();
+                    submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                    
                     $.ajax({
                         url: form.action,
                         type: form.method,
@@ -167,6 +203,23 @@
                                     text: response.message
                                 });
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(xhr.responseText);
+                            let errorMessage = 'Terjadi kesalahan pada server. Silakan coba lagi nanti.';
+                            
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Server Error',
+                                text: errorMessage
+                            });
+                        },
+                        complete: function() {
+                            submitBtn.prop('disabled', false).html(originalText);
                         }
                     });
                     return false;
