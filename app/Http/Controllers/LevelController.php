@@ -31,6 +31,10 @@ class LevelController extends Controller
     {
         $levels = LevelModel::select('level_id', 'level_kode', 'level_nama');
         
+        if ($request->has('level_id') && !empty($request->level_id)) {
+            $levels->where('level_id', $request->level_id);
+        }
+        
         return DataTables::of($levels)
             ->addIndexColumn()
             ->addColumn('action', function ($level) {
@@ -319,5 +323,49 @@ class LevelController extends Controller
         }
         
         return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        $level = \App\Models\LevelModel::orderBy('level_id')->get();
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Level');
+        $sheet->setCellValue('C1', 'Nama Level');
+
+        $sheet->getStyle('A1:C1')->getFont()->setBold(true);
+
+        $no = 1;
+        $baris = 2;
+        foreach ($level as $row) {
+            $sheet->setCellValue('A' . $baris, $no++);
+            $sheet->setCellValue('B' . $baris, $row->level_kode);
+            $sheet->setCellValue('C' . $baris, $row->level_nama);
+            $baris++;
+        }
+
+        foreach(range('A', 'C') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data Level');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data_Level ' . date('Y-m-d H-i-s') . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
     }
 }

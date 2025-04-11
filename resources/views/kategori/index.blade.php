@@ -5,9 +5,9 @@
         <div class="card-header">
             <h3 class="card-title">Data Kategori</h3>
             <div class="card-tools">
-                <button onclick="modalAction('{{ url('/kategori/import') }}')" class="btn btn-info btn-sm">Import</button>
-                <a href="{{ url('kategori/create') }}" class="btn btn-primary btn-sm">Tambah</a>
-                <button onclick="modalAction('{{ url('/kategori/create_ajax') }}')" class="btn btn-success btn-sm">Tambah (AJAX)</button>
+                <button onclick="modalAction('{{ url('/kategori/import') }}')" class="btn btn-info btn-sm"><i class="fa fa-upload"></i> Import</button>
+                <a href="{{ route('kategori.export') }}" class="btn btn-primary btn-sm"><i class="fa fa-file-excel"></i> Export</a>
+                <button onclick="modalAction('{{ url('/kategori/create_ajax') }}')" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Tambah</button>
             </div>
         </div>
         <div class="card-body">
@@ -18,6 +18,20 @@
             @if(session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="kategori_filter">Filter Kategori:</label>
+                        <select id="kategori_filter" class="form-control">
+                            <option value="">Semua Kategori</option>
+                            @foreach(\App\Models\KategoriModel::all() as $kategori)
+                                <option value="{{ $kategori->kategori_id }}">{{ $kategori->kategori_nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             <table class="table table-bordered table-striped table-hover" id="tbl-kategori">
                 <thead>
@@ -59,14 +73,15 @@
         }
 
         $(document).ready(function() {
-            $('#tbl-kategori').DataTable({
+            var table = $('#tbl-kategori').DataTable({
                 serverSide: true,
                 processing: true,
                 ajax: {
                     url: "{{ url('kategori/list') }}",
                     type: "POST",
                     data: function(d) {
-                        d._token = "{{ csrf_token() }}"
+                        d._token = "{{ csrf_token() }}";
+                        d.kategori_id = $('#kategori_filter').val();
                     }
                 },
                 columns: [{
@@ -90,6 +105,10 @@
                         searchable: false
                     }
                 ]
+            });
+            
+            $('#kategori_filter').on('change', function() {
+                table.ajax.reload();
             });
         });
     </script>

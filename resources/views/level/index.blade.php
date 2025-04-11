@@ -5,9 +5,9 @@
         <div class="card-header">
             <h3 class="card-title">Data Level</h3>
             <div class="card-tools">
-                <button onclick="modalAction('{{ url('/level/import') }}')" class="btn btn-info btn-sm">Import</button>
-                <a href="{{ url('level/create') }}" class="btn btn-primary btn-sm">Tambah</a>
-                <button onclick="modalAction('{{ url('/level/create_ajax') }}')" class="btn btn-success btn-sm">Tambah (AJAX)</button>
+                <button onclick="modalAction('{{ url('/level/import') }}')" class="btn btn-info btn-sm"><i class="fa fa-upload"></i> Import</button>
+                <a href="{{ route('level.export') }}" class="btn btn-primary btn-sm"><i class="fa fa-file-excel"></i> Export</a>
+                <button onclick="modalAction('{{ url('/level/create_ajax') }}')" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Tambah</button>
             </div>
         </div>
         <div class="card-body">
@@ -18,6 +18,20 @@
             @if(session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="level_filter">Filter Level:</label>
+                        <select id="level_filter" class="form-control">
+                            <option value="">Semua Level</option>
+                            @foreach(\App\Models\LevelModel::all() as $level)
+                                <option value="{{ $level->level_id }}">{{ $level->level_nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             <table class="table table-bordered table-striped table-hover" id="tbl-level">
                 <thead>
@@ -59,14 +73,15 @@
         }
 
         $(document).ready(function() {
-            $('#tbl-level').DataTable({
+            var table = $('#tbl-level').DataTable({
                 serverSide: true,
                 processing: true,
                 ajax: {
                     url: "{{ url('level/list') }}",
                     type: "POST",
                     data: function(d) {
-                        d._token = "{{ csrf_token() }}"
+                        d._token = "{{ csrf_token() }}";
+                        d.level_id = $('#level_filter').val();
                     }
                 },
                 columns: [{
@@ -90,6 +105,10 @@
                         searchable: false
                     }
                 ]
+            });
+            
+            $('#level_filter').on('change', function() {
+                table.ajax.reload();
             });
         });
     </script>

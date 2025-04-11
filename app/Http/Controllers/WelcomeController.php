@@ -10,7 +10,7 @@ class WelcomeController extends Controller
     {
         $breadcrumb = (object) [
             'title' => 'Selamat Datang',
-            'list' => ['Home', "Welome"]
+            'list' => ['Home', "Welcome"]
         ];
         $activeMenu = 'dashboard';
 

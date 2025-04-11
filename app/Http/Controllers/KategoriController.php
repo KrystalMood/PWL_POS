@@ -30,6 +30,10 @@ class KategoriController extends Controller
     {
         $kategori = KategoriModel::select('kategori_id', 'kategori_kode', 'kategori_nama');
         
+        if ($request->has('kategori_id') && !empty($request->kategori_id)) {
+            $kategori->where('kategori_id', $request->kategori_id);
+        }
+        
         return DataTables::of($kategori)
             ->addIndexColumn()
             ->addColumn('action', function ($kategori) {
@@ -319,5 +323,49 @@ class KategoriController extends Controller
         }
         
         return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        $kategori = \App\Models\KategoriModel::orderBy('kategori_id')->get();
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Kategori');
+        $sheet->setCellValue('C1', 'Nama Kategori');
+
+        $sheet->getStyle('A1:C1')->getFont()->setBold(true);
+
+        $no = 1;
+        $baris = 2;
+        foreach ($kategori as $row) {
+            $sheet->setCellValue('A' . $baris, $no++);
+            $sheet->setCellValue('B' . $baris, $row->kategori_kode);
+            $sheet->setCellValue('C' . $baris, $row->kategori_nama);
+            $baris++;
+        }
+
+        foreach(range('A', 'C') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data Kategori');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data_Kategori ' . date('Y-m-d H-i-s') . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
     }
 }

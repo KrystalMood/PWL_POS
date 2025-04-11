@@ -372,4 +372,52 @@ class UserController extends Controller
         
         return redirect('/');
     }
+
+    public function export_excel()
+    {
+        $user = \App\Models\UserModel::with('level')->orderBy('user_id')->get();
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Username');
+        $sheet->setCellValue('C1', 'Nama');
+        $sheet->setCellValue('D1', 'Level');
+        $sheet->setCellValue('E1', 'Email');
+
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+        $no = 1;
+        $baris = 2;
+        foreach ($user as $row) {
+            $sheet->setCellValue('A' . $baris, $no++);
+            $sheet->setCellValue('B' . $baris, $row->username);
+            $sheet->setCellValue('C' . $baris, $row->nama);
+            $sheet->setCellValue('D' . $baris, $row->level ? $row->level->level_nama : 'Tidak ada level');
+            $sheet->setCellValue('E' . $baris, $row->email);
+            $baris++;
+        }
+
+        foreach(range('A', 'E') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data User');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data_User ' . date('Y-m-d H-i-s') . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
+    }
 }

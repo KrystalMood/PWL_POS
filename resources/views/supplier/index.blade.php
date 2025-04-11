@@ -5,9 +5,9 @@
         <div class="card-header">
             <h3 class="card-title">Data Supplier</h3>
             <div class="card-tools">
-                <button onclick="modalAction('{{ url('/supplier/import') }}')" class="btn btn-info btn-sm">Import</button>
-                <a href="{{ url('supplier/create') }}" class="btn btn-primary btn-sm">Tambah</a>
-                <button onclick="modalAction('{{ url('/supplier/create_ajax') }}')" class="btn btn-success btn-sm">Tambah (AJAX)</button>
+                <button onclick="modalAction('{{ url('/supplier/import') }}')" class="btn btn-info btn-sm"><i class="fa fa-upload"></i> Import</button>
+                <a href="{{ route('supplier.export') }}" class="btn btn-primary btn-sm"><i class="fa fa-file-excel"></i> Export</a>
+                <button onclick="modalAction('{{ url('/supplier/create_ajax') }}')" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Tambah</button>
             </div>
         </div>
         <div class="card-body">
@@ -18,6 +18,20 @@
             @if(session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="supplier_filter">Filter Supplier:</label>
+                        <select id="supplier_filter" class="form-control">
+                            <option value="">Semua Supplier</option>
+                            @foreach(\App\Models\SupplierModel::all() as $supplier)
+                                <option value="{{ $supplier->supplier_id }}">{{ $supplier->supplier_nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             <table class="table table-bordered table-striped table-hover" id="tbl-supplier">
                 <thead>
@@ -60,14 +74,15 @@
         }
 
         $(document).ready(function() {
-            $('#tbl-supplier').DataTable({
+            var table = $('#tbl-supplier').DataTable({
                 serverSide: true,
                 processing: true,
                 ajax: {
                     url: "{{ url('supplier/list') }}",
                     type: "POST",
                     data: function(d) {
-                        d._token = "{{ csrf_token() }}"
+                        d._token = "{{ csrf_token() }}";
+                        d.supplier_id = $('#supplier_filter').val();
                     }
                 },
                 columns: [{
@@ -95,6 +110,10 @@
                         sortable: false
                     }
                 ]
+            });
+            
+            $('#supplier_filter').on('change', function() {
+                table.ajax.reload();
             });
         });
     </script>

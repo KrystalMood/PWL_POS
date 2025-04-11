@@ -1,67 +1,84 @@
-<div class="modal-header">
-    <h5 class="modal-title" id="exampleModalLabel">Konfirmasi Hapus Supplier</h5>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
-<div class="modal-body">
-    <form id="form-delete" action="{{ url('supplier/' . $supplier->supplier_id . '/delete_ajax') }}" method="POST">
-        @csrf
-        @method('DELETE')
-        <p>Apakah Anda yakin ingin menghapus supplier ini?</p>
-        <div class="alert alert-warning">
-            <h5>Detail Supplier:</h5>
-            <p><strong>Kode:</strong> {{ $supplier->supplier_kode }}</p>
-            <p><strong>Nama:</strong> {{ $supplier->supplier_nama }}</p>
-            <p><strong>Alamat:</strong> {{ $supplier->supplier_alamat }}</p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-            <button id="btn-delete" type="submit" class="btn btn-danger">Hapus</button>
-        </div>
-    </form>
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Supplier</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form id="form-delete" action="{{ url('supplier/' . $supplier->supplier_id . '/delete_ajax') }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <div class="alert alert-warning">
+                <h5><i class="icon fas fa-ban"></i> Konfirmasi !!!</h5>
+                Apakah Anda ingin menghapus data seperti di bawah ini?
+            </div>
+            <table class="table table-sm table-bordered table-striped">
+                <tr>
+                    <th class="text-right col-3">Kode Supplier :</th>
+                    <td class="col-9">{{ $supplier->supplier_kode }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Nama Supplier :</th>
+                    <td class="col-9">{{ $supplier->supplier_nama }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Alamat :</th>
+                    <td class="col-9">{{ $supplier->supplier_alamat }}</td>
+                </tr>
+            </table>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
+                <button type="submit" class="btn btn-primary">Ya, Hapus</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
     $(document).ready(function() {
-        $('#form-delete').on('submit', function(e) {
-            e.preventDefault();
-            
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'DELETE',
-                data: $(this).serialize(),
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status) {
-                        Swal.fire({
-                            title: 'Sukses!',
-                            text: response.message,
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
+        $("#form-delete").validate({
+            rules: {},
+            submitHandler: function(form) {
+                $.ajax({
+                    url: form.action,
+                    type: form.method,
+                    data: $(form).serialize(),
+                    success: function(response) {
+                        if (response.status) {
                             $('#myModal').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: response.message
+                            });
                             $('#tbl-supplier').DataTable().ajax.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: response.message,
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
+                        } else {
+                            $('.error-text').text('');
+                            $.each(response.msgField, function(prefix, val) {
+                                $('#error-' + prefix).text(val[0]);
+                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan',
+                                text: response.message
+                            });
+                        }
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error(error);
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Terjadi kesalahan saat memproses permintaan.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
+                });
+                return false;
+            },
+            errorElement: 'span',
+            errorPlacement: function(error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function(element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
         });
     });
 </script>
