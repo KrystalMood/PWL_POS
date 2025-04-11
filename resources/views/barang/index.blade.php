@@ -5,9 +5,9 @@
         <div class="card-header">
             <h3 class="card-title">Data Barang</h3>
             <div class="card-tools">
-                <button onclick="modalAction('{{ url('/barang/import') }}')" class="btn btn-info">Import Barang</button>
-                <a href="{{ url('/barang/create') }}" class="btn btn-primary">Tambah Data</a>
-                <button onclick="modalAction('{{ url('/barang/create_ajax') }}')" class="btn btn-success">Tambah Barang(AJAX)</button>
+                <button onclick="modalAction('{{ url('/barang/import') }}')" class="btn btn-info btn-sm">Import</button>
+                <a href="{{ url('/barang/create') }}" class="btn btn-primary btn-sm">Tambah</a>
+                <button onclick="modalAction('{{ url('/barang/create_ajax') }}')" class="btn btn-success btn-sm">Tambah (AJAX)</button>
             </div>
         </div>
         <div class="card-body">
@@ -51,7 +51,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" id="modal-content">
                 <!-- Content will be loaded here -->
             </div>

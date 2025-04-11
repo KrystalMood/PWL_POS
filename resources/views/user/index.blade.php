@@ -1,13 +1,13 @@
 @extends('layouts.template')
 
 @section('content')
-    <div class="card card-outline card-primary">
+    <div class="card">
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
-                <a href="{{ url('user/create') }}" class="btn btn-sm btn-primary mt-1">Tambah</a>
-                <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah
-                    Ajax</button>
+                <button onclick="modalAction('{{ url('/user/import') }}')" class="btn btn-info btn-sm">Import</button>
+                <a href="{{ url('user/create') }}" class="btn btn-primary btn-sm">Tambah</a>
+                <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-success btn-sm">Tambah (AJAX)</button>
             </div>
         </div>
         <div class="card-body">
@@ -17,19 +17,22 @@
             @if (session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
-            <div class="row">
-                <label class="col-1 control-label col-form-label">Filter:</label>
-                <div class="col-3">
-                    <select class="form-control" id="level_id" name="level_id" required>
-                        <option value="">- Semua -</option>
-                        @foreach ($level as $item)
-                            <option value="{{ $item->level_id }}">{{ $item->level_nama }}</option>
-                        @endforeach
-                    </select>
-                    <small class="form-text text-muted">Level Pengguna</small>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="level_id">Filter Level:</label>
+                        <select id="level_id" name="level_id" class="form-control">
+                            <option value="">- Semua -</option>
+                            @foreach ($level as $item)
+                                <option value="{{ $item->level_id }}">{{ $item->level_nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
-            <table class="table table-bordered table-striped table-hover table-sm" id="table_user">
+            
+            <table class="table table-bordered table-striped table-hover" id="table_user">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -43,8 +46,14 @@
         </div>
     </div>
 
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data- backdrop="static"
-        data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" id="modal-content">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('css')
@@ -52,9 +61,17 @@
 
 @push('js')
     <script>
-        function modalAction(url = '') {
-            $('#myModal').load(url, function () {
-                $('#myModal').modal('show');
+        function modalAction(url) {
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (data) {
+                    $('#modal-content').html(data);
+                    $('#myModal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
             });
         }
 
@@ -62,6 +79,7 @@
         $(document).ready(function () {
             dataUser = $('#table_user').DataTable({
                 serverSide: true,
+                processing: true,
                 ajax: {
                     "url": "{{ url('user/list') }}",
                     'dataType': 'json',
@@ -76,29 +94,23 @@
                 columns: [
                     {
                         data: "DT_RowIndex",
-                        className: 'text-center',
-                        orderable: false,
+                        name: 'DT_RowIndex',
                         searchable: false,
+                        sortable: false
                     }, {
                         data: 'username',
-                        className: "",
-                        orderable: true,
-                        searchable: true,
+                        name: 'username'
                     }, {
                         data: 'nama',
-                        className: "",
-                        orderable: true,
-                        searchable: true,
+                        name: 'nama'
                     }, {
                         data: 'level.level_nama',
-                        className: "",
-                        orderable: false,
-                        searchable: false,
+                        name: 'level.level_nama'
                     }, {
                         data: 'aksi',
-                        className: "text-center",
+                        name: 'aksi',
                         orderable: false,
-                        searchable: false,
+                        searchable: false
                     }
                 ]
             });

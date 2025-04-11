@@ -29,6 +29,8 @@ Route::middleware(['auth'])->group(function(){
             Route::post('/', [UserController::class, 'store']);
             Route::get('/create_ajax', [UserController::class, 'create_ajax']);
             Route::post('/ajax', [UserController::class, 'store_ajax']);
+            Route::get('/import', [UserController::class, 'import'])->name('user.import');
+            Route::post('/import_ajax', [UserController::class, 'import_ajax'])->name('user.import_ajax');
             Route::get('/{id}', [UserController::class, 'show']);
             Route::get('/{id}/edit', [UserController::class, 'edit']);
             Route::put('/{id}', [UserController::class, 'update']);
@@ -47,6 +49,8 @@ Route::middleware(['auth'])->group(function(){
             Route::post('/', [LevelController::class, 'store']);
             Route::get('/create_ajax', [LevelController::class, 'create_ajax']);
             Route::post('/ajax', [LevelController::class, 'store_ajax']);
+            Route::get('/import', [LevelController::class, 'import'])->name('level.import');
+            Route::post('/import_ajax', [LevelController::class, 'import_ajax'])->name('level.import_ajax');
             Route::get('/{id}', [LevelController::class, 'show']);
             Route::get('/{id}/edit', [LevelController::class, 'edit']);
             Route::put('/{id}', [LevelController::class, 'update']);
@@ -65,6 +69,8 @@ Route::middleware(['auth'])->group(function(){
             Route::post('/', [KategoriController::class, 'store']);
             Route::get('/create_ajax', [KategoriController::class, 'create_ajax']);
             Route::post('/ajax', [KategoriController::class, 'store_ajax']);
+            Route::get('/import', [KategoriController::class, 'import'])->name('kategori.import');
+            Route::post('/import_ajax', [KategoriController::class, 'import_ajax'])->name('kategori.import_ajax');
             Route::get('/{id}', [KategoriController::class, 'show']);
             Route::get('/{id}/edit', [KategoriController::class, 'edit']);
             Route::put('/{id}', [KategoriController::class, 'update']);
@@ -83,6 +89,8 @@ Route::middleware(['auth'])->group(function(){
             Route::post('/', [SupplierController::class, 'store']);
             Route::get('/create_ajax', [SupplierController::class, 'create_ajax']);
             Route::post('/ajax', [SupplierController::class, 'store_ajax']);
+            Route::get('/import', [SupplierController::class, 'import'])->name('supplier.import');
+            Route::post('/import_ajax', [SupplierController::class, 'import_ajax'])->name('supplier.import_ajax');
             Route::get('/{id}', [SupplierController::class, 'show']);
             Route::get('/{id}/edit', [SupplierController::class, 'edit']);
             Route::put('/{id}', [SupplierController::class, 'update']);
