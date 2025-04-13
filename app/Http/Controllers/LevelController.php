@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LevelController extends Controller
 {
@@ -367,5 +368,38 @@ class LevelController extends Controller
 
         $writer->save('php://output');
         exit;
+    }
+    
+    public function export_pdf()
+    {
+        ini_set('max_execution_time', 300);
+        
+        $allLevel = [];
+        LevelModel::select('level_id', 'level_kode', 'level_nama')
+            ->orderBy('level_id')
+            ->chunk(100, function($levels) use (&$allLevel) {
+                foreach ($levels as $item) {
+                    $allLevel[] = $item;
+                }
+            });
+            
+        if (empty($allLevel)) {
+            $allLevel = LevelModel::select('level_id', 'level_kode', 'level_nama')
+                ->orderBy('level_id')
+                ->get();
+        }
+
+        $pdf = Pdf::loadView('level.export_pdf', ['level' => $allLevel]);
+        $pdf->setPaper('A4', 'portrait');
+        
+        $pdf->setOptions([
+            'isRemoteEnabled' => false,
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => false,
+            'dpi' => 96,
+            'defaultFont' => 'sans-serif'
+        ]);
+        
+        return $pdf->stream('Data_Level ' . date('Y-m-d_H-i-s') . '.pdf');
     }
 }

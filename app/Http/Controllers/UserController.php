@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -419,5 +420,44 @@ class UserController extends Controller
 
         $writer->save('php://output');
         exit;
+    }
+    
+    public function export_pdf()
+    {
+        ini_set('max_execution_time', 300);
+        
+        $allUser = [];
+        UserModel::select('user_id', 'username', 'nama', 'level_id')
+            ->with(['level' => function($query) {
+                $query->select('level_id', 'level_nama');
+            }])
+            ->orderBy('user_id')
+            ->chunk(100, function($users) use (&$allUser) {
+                foreach ($users as $item) {
+                    $allUser[] = $item;
+                }
+            });
+            
+        if (empty($allUser)) {
+            $allUser = UserModel::select('user_id', 'username', 'nama', 'level_id')
+                ->with(['level' => function($query) {
+                    $query->select('level_id', 'level_nama');
+                }])
+                ->orderBy('user_id')
+                ->get();
+        }
+
+        $pdf = Pdf::loadView('user.export_pdf', ['user' => $allUser]);
+        $pdf->setPaper('A4', 'portrait');
+        
+        $pdf->setOptions([
+            'isRemoteEnabled' => false,
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => false,
+            'dpi' => 96,
+            'defaultFont' => 'sans-serif'
+        ]);
+        
+        return $pdf->stream('Data_User ' . date('Y-m-d_H-i-s') . '.pdf');
     }
 }

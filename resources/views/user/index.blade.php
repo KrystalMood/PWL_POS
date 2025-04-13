@@ -6,7 +6,8 @@
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
                 <button onclick="modalAction('{{ url('/user/import') }}')" class="btn btn-info btn-sm"><i class="fa fa-upload"></i> Import</button>
-                <a href="{{ route('user.export') }}" class="btn btn-primary btn-sm"><i class="fa fa-file-excel"></i> Export</a>
+                <a href="{{ route('user.export_excel') }}" class="btn btn-primary btn-sm"><i class="fa fa-file-excel"></i> Export Excel</a>
+                <a href="{{ route('user.export_pdf') }}" class="btn btn-danger btn-sm"><i class="fa fa-file-pdf"></i> Export PDF</a>
                 <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Tambah</button>
             </div>
         </div>

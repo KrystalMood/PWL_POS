@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KategoriController extends Controller
 {
@@ -367,5 +368,38 @@ class KategoriController extends Controller
 
         $writer->save('php://output');
         exit;
+    }
+    
+    public function export_pdf()
+    {
+        ini_set('max_execution_time', 300);
+        
+        $allKategori = [];
+        KategoriModel::select('kategori_id', 'kategori_kode', 'kategori_nama')
+            ->orderBy('kategori_id')
+            ->chunk(100, function($kategoris) use (&$allKategori) {
+                foreach ($kategoris as $item) {
+                    $allKategori[] = $item;
+                }
+            });
+            
+        if (empty($allKategori)) {
+            $allKategori = KategoriModel::select('kategori_id', 'kategori_kode', 'kategori_nama')
+                ->orderBy('kategori_id')
+                ->get();
+        }
+
+        $pdf = Pdf::loadView('kategori.export_pdf', ['kategori' => $allKategori]);
+        $pdf->setPaper('A4', 'portrait');
+        
+        $pdf->setOptions([
+            'isRemoteEnabled' => false,
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => false,
+            'dpi' => 96,
+            'defaultFont' => 'sans-serif'
+        ]);
+        
+        return $pdf->stream('Data_Kategori ' . date('Y-m-d_H-i-s') . '.pdf');
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SupplierController extends Controller
 {
@@ -348,9 +349,9 @@ class SupplierController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'Nama');
-        $sheet->setCellValue('C1', 'Alamat');
-        $sheet->setCellValue('D1', 'No Telp');
+        $sheet->setCellValue('B1', 'Kode');
+        $sheet->setCellValue('C1', 'Nama');
+        $sheet->setCellValue('D1', 'Alamat');
 
         $sheet->getStyle('A1:D1')->getFont()->setBold(true);
 
@@ -358,9 +359,9 @@ class SupplierController extends Controller
         $baris = 2;
         foreach ($supplier as $row) {
             $sheet->setCellValue('A' . $baris, $no++);
-            $sheet->setCellValue('B' . $baris, $row->nama);
-            $sheet->setCellValue('C' . $baris, $row->alamat);
-            $sheet->setCellValue('D' . $baris, $row->no_telp);
+            $sheet->setCellValue('B' . $baris, $row->supplier_kode);
+            $sheet->setCellValue('C' . $baris, $row->supplier_nama);
+            $sheet->setCellValue('D' . $baris, $row->supplier_alamat);
             $baris++;
         }
 
@@ -384,5 +385,38 @@ class SupplierController extends Controller
 
         $writer->save('php://output');
         exit;
+    }
+    
+    public function export_pdf()
+    {
+        ini_set('max_execution_time', 300);
+        
+        $allSupplier = [];
+        SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'supplier_alamat')
+            ->orderBy('supplier_id')
+            ->chunk(100, function($suppliers) use (&$allSupplier) {
+                foreach ($suppliers as $item) {
+                    $allSupplier[] = $item;
+                }
+            });
+            
+        if (empty($allSupplier)) {
+            $allSupplier = SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'supplier_alamat')
+                ->orderBy('supplier_id')
+                ->get();
+        }
+
+        $pdf = Pdf::loadView('supplier.export_pdf', ['supplier' => $allSupplier]);
+        $pdf->setPaper('A4', 'portrait');
+        
+        $pdf->setOptions([
+            'isRemoteEnabled' => false,
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => false,
+            'dpi' => 96,
+            'defaultFont' => 'sans-serif'
+        ]);
+        
+        return $pdf->stream('Data_Supplier ' . date('Y-m-d_H-i-s') . '.pdf');
     }
 }
