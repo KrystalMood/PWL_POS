@@ -132,4 +132,8 @@ Route::middleware(['auth'])->group(function(){
             Route::delete('/{id}', [BarangController::class, 'destroy']);
         });
     });
+
+
+    Route::get('/profile/photo/edit', [UserController::class, 'edit_profile_photo'])->name('profile.photo.edit');
+    Route::post('/profile/photo/update', [UserController::class, 'update_profile_photo'])->name('profile.photo.update');
 });

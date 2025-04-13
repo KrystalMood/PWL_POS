@@ -460,4 +460,70 @@ class UserController extends Controller
         
         return $pdf->stream('Data_User ' . date('Y-m-d_H-i-s') . '.pdf');
     }
+
+    public function upload_profile_photo_form()
+    {
+        if (request()->ajax()) {
+            return view('user.upload_profile_photo');
+        }
+        
+        return redirect('/');
+    }
+    
+    public function update_profile_photo(Request $request)
+    {
+        $rules = [
+            'profile_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ];
+        
+        $validator = Validator::make($request->all(), $rules);
+        
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        
+        try {
+            $photo = $request->file('profile_photo');
+            $fileName = 'profile_' . time() . '.' . $photo->getClientOriginalExtension();
+            
+            $uploadPath = public_path('uploads/profile_photos');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+
+            $photo->move($uploadPath, $fileName);
+            
+            $user = auth()->user();
+            if ($user) {
+                UserModel::where('user_id', $user->user_id)
+                    ->update(['profile_photo' => 'uploads/profile_photos/' . $fileName]);
+            }
+            
+            return redirect()->route('profile.photo.edit')->with('success', 'Foto profil berhasil diupload');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengupload foto profil: ' . $e->getMessage());
+        }
+    }
+
+    public function edit_profile_photo()
+    {
+        $breadcrumb = (object) [
+            'title' => 'Edit Foto Profil',
+            'list' => ['Home', 'Profil', 'Edit Foto']
+        ];
+
+        $page = (object) [
+            'title' => 'Upload foto profil baru',
+        ];
+
+        $activeMenu = 'profile';
+
+        return view('user.edit_profile_photo', [
+            'breadcrumb' => $breadcrumb, 
+            'page' => $page, 
+            'activeMenu' => $activeMenu
+        ]);
+    }
 }

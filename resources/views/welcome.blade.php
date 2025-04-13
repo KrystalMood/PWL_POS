@@ -9,7 +9,11 @@
                 <div class="card-body box-profile py-3">
                     <div class="row">
                         <div class="col-md-3 text-center d-flex align-items-center justify-content-center">
-                            <img class="profile-user-img img-fluid img-circle shadow" src="{{ asset('adminlte/dist/img/user4-128x128.jpg') }}" alt="User profile picture" style="width: 150px; height: 150px; border: 3px solid #fff;">
+                            @if(auth()->check() && auth()->user()->profile_photo)
+                                <img class="profile-user-img img-fluid img-circle shadow" src="{{ asset(auth()->user()->profile_photo) }}" alt="User profile picture" style="width: 150px; height: 150px; border: 3px solid #fff; object-fit: cover;">
+                            @else
+                                <img class="profile-user-img img-fluid img-circle shadow" src="{{ asset('adminlte/dist/img/user4-128x128.jpg') }}" alt="User profile picture" style="width: 150px; height: 150px; border: 3px solid #fff;">
+                            @endif
                         </div>
                         
                         <div class="col-md-9">
@@ -28,9 +32,9 @@
                             </div>
                             
                             <div class="mt-3">
-                                <a href="#" class="btn btn-primary btn-sm px-4 shadow-sm">
+                                <button onclick="editProfilePhoto()" class="btn btn-primary btn-sm px-4 shadow-sm">
                                     <i class="fas fa-user-edit mr-1"></i> Edit Profil
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -92,4 +96,22 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalAction" tabindex="-1" role="dialog" aria-labelledby="modalActionTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" id="modalActionContent">
+            <!-- Content will be loaded dynamically -->
+        </div>
+    </div>
+</div>
+
 @endsection
+
+@push('js')
+<script>
+    function editProfilePhoto() {
+        window.location.href = '{{ route("profile.photo.edit") }}';
+    }
+</script>
+@endpush
