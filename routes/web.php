@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\StokController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\SalesController;
@@ -130,6 +131,12 @@ Route::middleware(['auth'])->group(function(){
             Route::get('/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']);
             Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
             Route::delete('/{id}', [BarangController::class, 'destroy']);
+        });
+
+        Route::prefix('stok')->group(function () {
+            Route::get('/', [StokController::class, 'index']);
+            Route::post('/list', [StokController::class, 'list']);
+            Route::get('/{id}/show_ajax', [StokController::class, 'show_ajax']);
         });
     });
 
