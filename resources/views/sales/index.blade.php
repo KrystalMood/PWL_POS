@@ -1,44 +1,75 @@
-@extends('layouts.app')
+@extends('layouts.template')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Product Name</h6>
-                                    <p class="card-text">Rp. 10.000</p>
-                                    <button class="btn btn-primary btn-sm w-100">Add</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Data Transaksi Penjualan</h3>
+        <div class="card-tools">
+            <button onclick="modalAction('{{ url('/sales/import') }}')" class="btn btn-info btn-sm"><i class="fa fa-upload"></i> Import</button>
+            <a href="{{ route('sales.export_excel') }}" class="btn btn-primary btn-sm"><i class="fa fa-file-excel"></i> Export Excel</a>
+            <a href="{{ route('sales.export_pdf') }}" class="btn btn-danger btn-sm"><i class="fa fa-file-pdf"></i> Export PDF</a>
+            <button onclick="modalAction('{{ url('/sales/create_ajax') }}')" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Tambah</button>
         </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped" id="tbl-penjualan">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Kode Penjualan</th>
+                    <th>User</th>
+                    <th>Pembeli</th>
+                    <th>Tanggal</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    Shopping Cart
-                </div>
-                <div class="card-body">
-                    <div class="cart-items mb-3">
-                        
-                    </div>
-                    <div class="cart-total border-top pt-3">
-                        <h5>Total: Rp. 0</h5>
-                        <button class="btn btn-success w-100 mt-2">Process Payment</button>
-                    </div>
-                </div>
-            </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="modal-content">
+            <!-- Content akan dimuat via AJAX -->
         </div>
     </div>
 </div>
 @endsection
+
+@push('js')
+<script>
+    function modalAction(url) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (data) {
+                $('#modal-content').html(data);
+                $('#myModal').modal('show');
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        var table = $('#tbl-penjualan').DataTable({
+            serverSide: true,
+            processing: true,
+            ajax: {
+                url: "{{ url('sales/list') }}",
+                type: "POST",
+                data: function (d) {
+                    d._token = "{{ csrf_token() }}";
+                }
+            },
+            columns: [
+                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                {data: 'penjualan_kode', name: 'penjualan_kode'},
+                {data: 'user_nama', name: 'user_nama'},
+                {data: 'pembeli', name: 'pembeli'},
+                {data: 'penjualan_tanggal', name: 'penjualan_tanggal'},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ]
+        });
+    });
+</script>
+@endpush

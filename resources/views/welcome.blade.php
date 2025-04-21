@@ -57,37 +57,37 @@
                         <div class="col-md-4">
                             <div class="small-box bg-info shadow-sm">
                                 <div class="inner">
-                                    <h3>150</h3>
+                                    <h3>{{ $barangCount }}</h3> 
                                     <p>Produk</p>
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-shopping-cart"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">Info Lebih <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="{{ url('/barang') }}" class="small-box-footer">Info Lebih <i class="fas fa-arrow-circle-right"></i></a> 
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="small-box bg-success shadow-sm">
                                 <div class="inner">
-                                    <h3>25</h3>
+                                    <h3>{{ $kategoriCount }}</h3> 
                                     <p>Kategori</p>
                                 </div>
                                 <div class="icon">
                                     <i class="fas fa-tag"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">Info Lebih <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="{{ url('/kategori') }}" class="small-box-footer">Info Lebih <i class="fas fa-arrow-circle-right"></i></a> 
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="small-box bg-warning shadow-sm">
                                 <div class="inner">
-                                    <h3>12</h3>
-                                    <p>Supplier</p>
+                                    <h3>{{ $userCount }}</h3> 
+                                    <p>Pengguna</p>
                                 </div>
                                 <div class="icon">
-                                    <i class="fas fa-truck"></i>
+                                    <i class="fas fa-user-plus"></i> 
                                 </div>
-                                <a href="#" class="small-box-footer">Info Lebih <i class="fas fa-arrow-circle-right"></i></a>
+                                <a href="{{ url('/user') }}" class="small-box-footer">Info Lebih <i class="fas fa-arrow-circle-right"></i></a> 
                             </div>
                         </div>
                     </div>
@@ -97,11 +97,11 @@
     </div>
 </div>
 
-<!-- Modal -->
+
 <div class="modal fade" id="modalAction" tabindex="-1" role="dialog" aria-labelledby="modalActionTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content" id="modalActionContent">
-            <!-- Content will be loaded dynamically -->
+            
         </div>
     </div>
 </div>

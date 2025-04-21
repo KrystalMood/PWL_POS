@@ -5,8 +5,10 @@
         <div class="card-header">
             <h3 class="card-title">Data Stok</h3>
             <div class="card-tools">
-                <button onclick="modalAction('{{ url('/stok/create_ajax') }}')" class="btn btn-success btn-sm"><i
-                        class="fa fa-plus"></i> Tambah</button>
+                <button onclick="modalAction('{{ route('stok.import') }}')" class="btn btn-info btn-sm"><i class="fa fa-upload"></i> Import</button>
+                <a href="{{ route('stok.export_excel') }}" class="btn btn-primary btn-sm"><i class="fa fa-file-excel"></i> Export Excel</a>
+                <a href="{{ route('stok.export_pdf') }}" class="btn btn-danger btn-sm"><i class="fa fa-file-pdf"></i> Export PDF</a>
+                <button onclick="modalAction('{{ url('/stok/create_ajax') }}')" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Tambah</button>
             </div>
         </div>
         <div class="card-body">
@@ -55,6 +57,7 @@
                         <th>Action</th>
                     </tr>
                 </thead>
+                <tbody></tbody>
             </table>
         </div>
     </div>
@@ -87,9 +90,10 @@
         }
 
         $(document).ready(function() {
-            var table = $('#tbl-stok').DataTable({
+            var tableStok = $('#tbl-stok').DataTable({
                 serverSide: true,
                 processing: true,
+                responsive: true,
                 ajax: {
                     url: "{{ url('stok/list') }}",
                     type: "POST",
@@ -132,11 +136,43 @@
                     sortable: false
                 }
                 ]
-            })
+            });
 
             $('#barang_filter, #supplier_filter').on('change', function () {
-                table.ajax.reload();
-            })
-        })
+                tableStok.ajax.reload();
+            });
+            
+            $(document).on('submit', '#form-stok', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var url = form.attr('action');
+                var method = form.attr('method');
+                
+                $.ajax({
+                    url: url,
+                    method: method,
+                    data: form.serialize(),
+                    success: function(response) {
+                        if(response.status) {
+                            $('#myModal').modal('hide');
+                            tableStok.ajax.reload();
+                            toastr.success(response.message || 'Data berhasil diproses');
+                        } else {
+                            toastr.error(response.message || 'Terjadi kesalahan');
+                        }
+                    },
+                    error: function(xhr) {
+                        var errors = xhr.responseJSON?.errors;
+                        if(errors) {
+                            $.each(errors, function(field, messages) {
+                                toastr.error(messages[0]);
+                            });
+                        } else {
+                            toastr.error('Terjadi kesalahan pada server');
+                        }
+                    }
+                });
+            });
+        });
     </script>
 @endpush
