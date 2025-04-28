@@ -10,6 +10,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class UserModel extends Authenticatable implements JWTSubject
 {
+    use HasFactory, Notifiable, HasApiTokens; 
     public function getJWTIdentifier()
     {
         return $this->getKey();
