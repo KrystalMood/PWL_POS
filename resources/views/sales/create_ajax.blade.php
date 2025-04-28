@@ -21,7 +21,12 @@
             <label>Barang</label>
             <table class="table table-bordered" id="items-table">
                 <thead>
-                    <tr><th>Barang</th><th>Harga</th><th>Jumlah</th><th>Aksi</th></tr>
+                    <tr>
+                        <th class="col-6">Barang</th>
+                        <th class="col-3">Harga</th>
+                        <th class="col-2">Jumlah</th>
+                        <th class="col-1">Aksi</th>
+                    </tr>
                 </thead>
                 <tbody></tbody>
             </table>
@@ -36,51 +41,51 @@
 </div>
 
 <script>
-$(function() {
-    var barangOptions = '';
-    @foreach($barang as $b)
-        barangOptions += '<option value="{{$b->barang_id}}" data-harga="{{$b->harga_jual}}">{{$b->barang_nama}}</option>';
-    @endforeach
-    function addRow() {
-        var row = '<tr>' +
-            '<td><select name="barang_id[]" class="form-control barang-select"><option value="">Pilih</option>' + barangOptions + '</select></td>' +
-            '<td><input type="text" name="harga_jual[]" class="form-control harga-input" readonly></td>' +
-            '<td><input type="number" name="jumlah[]" class="form-control jumlah-input" min="1"></td>' +
-            '<td><button type="button" class="btn btn-danger btn-sm remove-item">X</button></td>' +
-            '</tr>';
-        $('#items-table tbody').append(row);
-    }
-    $('#add-item').click(addRow);
-    $(document).on('change', '.barang-select', function() {
-        var harga = $(this).find('option:selected').data('harga');
-        $(this).closest('tr').find('.harga-input').val(harga);
-    });
-    $(document).on('click', '.remove-item', function() {
-        $(this).closest('tr').remove();
-    });
-    
-    addRow();
-    $('#form-penjualan').on('submit', function(e) {
-        e.preventDefault();
-        $.ajax({
-            url: "{{ url('sales/ajax') }}",
-            method: "POST",
-            data: $(this).serialize(),
-            dataType: 'json',
-            success: function(res) {
-                if (res.status) {
-                    Swal.fire({icon:'success',title:'Berhasil',text:res.message}).then(()=>{
-                        $('#myModal').modal('hide');
-                        $('#tbl-penjualan').DataTable().ajax.reload();
-                    });
-                } else {
-                    $('.text-danger').text('');
-                    if(res.msgField){ $.each(res.msgField,function(k,v){ $('#error-'+k).text(v[0]); }); }
-                    Swal.fire({icon:'error',title:'Gagal',text:res.message});
-                }
-            },
-            error: function() { Swal.fire({icon:'error',title:'Error',text:'Terjadi kesalahan'}); }
+    $(function () {
+        var barangOptions = '';
+        @foreach($barang as $b)
+            barangOptions += '<option value="{{$b->barang_id}}" data-harga="{{$b->harga_jual}}">{{$b->barang_nama}}</option>';
+        @endforeach
+        function addRow() {
+            var row = '<tr>' +
+                '<td><select name="barang_id[]" class="form-control barang-select"><option value="">Pilih</option>' + barangOptions + '</select></td>' +
+                '<td><input type="text" name="harga_jual[]" class="form-control harga-input" readonly></td>' +
+                '<td><input type="number" name="jumlah[]" class="form-control jumlah-input" min="1"></td>' +
+                '<td><button type="button" class="btn btn-danger btn-sm remove-item">X</button></td>' +
+                '</tr>';
+            $('#items-table tbody').append(row);
+        }
+        $('#add-item').click(addRow);
+        $(document).on('change', '.barang-select', function () {
+            var harga = $(this).find('option:selected').data('harga');
+            $(this).closest('tr').find('.harga-input').val(harga);
+        });
+        $(document).on('click', '.remove-item', function () {
+            $(this).closest('tr').remove();
+        });
+
+        addRow();
+        $('#form-penjualan').on('submit', function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: "{{ url('sales/ajax') }}",
+                method: "POST",
+                data: $(this).serialize(),
+                dataType: 'json',
+                success: function (res) {
+                    if (res.status) {
+                        Swal.fire({ icon: 'success', title: 'Berhasil', text: res.message }).then(() => {
+                            $('#myModal').modal('hide');
+                            $('#tbl-penjualan').DataTable().ajax.reload();
+                        });
+                    } else {
+                        $('.text-danger').text('');
+                        if (res.msgField) { $.each(res.msgField, function (k, v) { $('#error-' + k).text(v[0]); }); }
+                        Swal.fire({ icon: 'error', title: 'Gagal', text: res.message });
+                    }
+                },
+                error: function () { Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan' }); }
+            });
         });
     });
-});
 </script>
